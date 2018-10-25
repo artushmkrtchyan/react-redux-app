@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 
-import { userActions, alertActions } from "../../actions";
+import { userActions, alertActions, validationActions } from "../../actions";
 import "./style.scss";
 
 class Register extends Component {
@@ -21,7 +21,7 @@ class Register extends Component {
   }
 
   handleChange = e => {
-    const { dispatch, alert } = this.props;
+    const { dispatch, alert, validation } = this.props;
     if (alert && alert.message) {
       dispatch(alertActions.clear());
     }
@@ -33,6 +33,9 @@ class Register extends Component {
         [name]: value
       }
     });
+    if (validation && validation[name]) {
+      dispatch(validationActions.clear(name));
+    }
   };
 
   handleSubmit = e => {
@@ -47,7 +50,8 @@ class Register extends Component {
   };
 
   render() {
-    const { registering, alert } = this.props;
+    const { registering, alert, validation } = this.props;
+
     const { user, submitted } = this.state;
     return (
       <div className="registerForm">
@@ -73,9 +77,10 @@ class Register extends Component {
             {submitted &&
               !user.name && <div className="help-block">Name is required</div>}
           </div>
+
           <div
             className={
-              "form-group" + (submitted && !user.email ? " has-error" : "")
+              "form-group" + (submitted && validation.email ? " has-error" : "")
             }
           >
             <label htmlFor="email">Email</label>
@@ -87,13 +92,15 @@ class Register extends Component {
               onChange={this.handleChange}
             />
             {submitted &&
-              !user.email && (
-                <div className="help-block">Email is required</div>
+              validation.email && (
+                <div className="help-block">{validation.email}</div>
               )}
           </div>
+
           <div
             className={
-              "form-group" + (submitted && !user.password ? " has-error" : "")
+              "form-group" +
+              (submitted && validation.password ? " has-error" : "")
             }
           >
             <label htmlFor="password">Password</label>
@@ -105,17 +112,17 @@ class Register extends Component {
               onChange={this.handleChange}
             />
             {submitted &&
-              !user.password && (
-                <div className="help-block">Password is required</div>
+              validation.password && (
+                <div className="help-block">{validation.password}</div>
               )}
           </div>
           <div
             className={
               "form-group" +
-              (submitted && !user.password_confirmation ? " has-error" : "")
+              (submitted && validation.password ? " has-error" : "")
             }
           >
-            <label htmlFor="password_confirmation">Password</label>
+            <label htmlFor="password_confirmation">Password Confirmation</label>
             <input
               type="password"
               className="form-control"
@@ -124,8 +131,8 @@ class Register extends Component {
               onChange={this.handleChange}
             />
             {submitted &&
-              !user.password_confirmation && (
-                <div className="help-block">Password is required</div>
+              validation.password && (
+                <div className="help-block">{validation.password}</div>
               )}
           </div>
           <div className="form-group">
@@ -148,10 +155,12 @@ class Register extends Component {
 
 function mapStateToProps(state) {
   const { registering } = state.registration;
-  const { alert } = state;
+  const { alert, validation } = state;
+
   return {
     registering,
-    alert
+    alert,
+    validation
   };
 }
 

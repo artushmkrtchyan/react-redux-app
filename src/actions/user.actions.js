@@ -1,6 +1,6 @@
 import { userConstants } from '../constants';
 import { userService } from '../services';
-import { alertActions } from './';
+import { alertActions, validationActions } from './';
 import { history } from '../helpers';
 
 export const userActions = {
@@ -53,8 +53,9 @@ function register(user) {
                 error => {
                     dispatch(failure(error.toString()));
                     dispatch(alertActions.error(error.toString()));
+                    dispatch(validationActions.apiError(error));
                 }
-            );
+            )
     };
 
     function request(user) { return { type: userConstants.REGISTER_REQUEST, user } }
